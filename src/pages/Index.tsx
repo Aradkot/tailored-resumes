@@ -17,7 +17,7 @@ const Index = () => {
     setStep(2);
   };
 
-  const handleJobDescriptionSubmit = async (jobDescription: string) => {
+  const handleJobDescriptionSubmit = async (jobDescription: string, existingCV?: string) => {
     try {
       // Get the API key from environment
       const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
@@ -38,7 +38,7 @@ const Index = () => {
         description: "Please wait while we create your tailored resume...",
       });
 
-      const content = await generateResume(personalInfo!, jobDescription);
+      const content = await generateResume(personalInfo!, jobDescription, existingCV);
       setGeneratedContent(content);
       setStep(3);
     } catch (error) {
