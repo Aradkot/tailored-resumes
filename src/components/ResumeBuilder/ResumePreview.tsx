@@ -24,41 +24,56 @@ export function ResumePreview({
       case "creative":
         return {
           container: "p-8 max-w-[800px] mx-auto bg-gradient-to-br from-blue-50 to-white shadow-lg",
-          header: "text-center border-b border-blue-200 pb-6",
-          name: "text-3xl font-bold text-blue-800",
-          contact: "mt-2 text-blue-600 space-y-1",
-          section: "border-l-4 border-blue-400 pl-4 py-2",
-          sectionTitle: "text-xl font-bold text-blue-800 mb-2",
-          content: "text-blue-900",
+          header: "text-center border-b border-blue-200 pb-6 mb-6",
+          name: "text-3xl font-bold text-blue-800 mb-2",
+          contact: "mt-2 text-blue-600 flex flex-wrap gap-3 justify-center",
+          section: "mb-6 border-l-4 border-blue-400 pl-4",
+          sectionTitle: "text-xl font-bold text-blue-800 mb-3",
+          content: "text-blue-900 leading-relaxed",
+          bullet: "list-disc ml-4 mb-2",
         };
       case "tech":
         return {
           container: "p-8 max-w-[800px] mx-auto bg-slate-50 shadow-lg border-t-4 border-indigo-500",
-          header: "text-left border-b border-slate-200 pb-6",
-          name: "text-3xl font-bold text-slate-800",
-          contact: "mt-2 text-slate-600 space-y-1 flex flex-wrap gap-4",
-          section: "border-b border-slate-200 py-4",
-          sectionTitle: "text-xl font-bold text-indigo-600 mb-2",
-          content: "text-slate-700",
+          header: "text-left border-b border-slate-200 pb-6 mb-6",
+          name: "text-3xl font-bold text-slate-800 mb-2",
+          contact: "mt-2 text-slate-600 flex flex-wrap gap-4",
+          section: "mb-6 py-2",
+          sectionTitle: "text-xl font-bold text-indigo-600 mb-3 border-b border-indigo-200 pb-1",
+          content: "text-slate-700 leading-relaxed",
+          bullet: "list-disc ml-4 mb-2",
         };
       default: // professional
         return {
           container: "p-8 max-w-[800px] mx-auto bg-white shadow-lg",
-          header: "text-center border-b pb-6",
-          name: "text-3xl font-bold text-gray-900",
-          contact: "mt-2 text-gray-600 space-y-1",
-          section: "py-4",
-          sectionTitle: "text-xl font-bold text-gray-900 mb-2",
-          content: "text-gray-700",
+          header: "text-center border-b border-gray-200 pb-6 mb-6",
+          name: "text-3xl font-bold text-gray-900 mb-2",
+          contact: "mt-2 text-gray-600 flex flex-wrap gap-3 justify-center",
+          section: "mb-6",
+          sectionTitle: "text-xl font-bold text-gray-900 mb-3 border-b border-gray-200 pb-1",
+          content: "text-gray-700 leading-relaxed",
+          bullet: "list-disc ml-4 mb-2",
         };
     }
   };
 
   const styles = getTemplateStyles();
 
+  const formatContent = (content: string) => {
+    return content
+      .split('\n')
+      .map((line, index) => {
+        if (line.trim().startsWith('•')) {
+          return <li key={index} className={styles.bullet}>{line.trim().substring(1)}</li>;
+        }
+        return <p key={index} className="mb-2">{line}</p>;
+      });
+  };
+
   return (
     <div className="space-y-6 animate-fade-in">
-      <div className="flex justify-end mb-4">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-semibold">Resume Preview</h2>
         <Select value={template} onValueChange={setTemplate}>
           <SelectTrigger className="w-[200px]">
             <SelectValue placeholder="Choose template" />
@@ -73,28 +88,21 @@ export function ResumePreview({
 
       <Card className={styles.container}>
         <div className="resume-preview">
-          <div className={styles.header}>
+          <header className={styles.header}>
             <h1 className={`resume-heading ${styles.name}`}>
               {personalInfo.fullName}
             </h1>
             <div className={styles.contact}>
-              <p>{personalInfo.email}</p>
-              {personalInfo.phone && <p>{personalInfo.phone}</p>}
-              {personalInfo.location && <p>{personalInfo.location}</p>}
+              <span>{personalInfo.email}</span>
+              {personalInfo.phone && <span>•</span>}
+              {personalInfo.phone && <span>{personalInfo.phone}</span>}
+              {personalInfo.location && <span>•</span>}
+              {personalInfo.location && <span>{personalInfo.location}</span>}
             </div>
-          </div>
+          </header>
 
-          {personalInfo.summary && (
-            <div className={styles.section}>
-              <h2 className={`resume-heading ${styles.sectionTitle}`}>
-                Professional Summary
-              </h2>
-              <p className={`resume-body ${styles.content}`}>{personalInfo.summary}</p>
-            </div>
-          )}
-
-          <div className={`resume-body whitespace-pre-wrap ${styles.content}`}>
-            {generatedContent}
+          <div className={`resume-body ${styles.content}`}>
+            {formatContent(generatedContent)}
           </div>
         </div>
       </Card>

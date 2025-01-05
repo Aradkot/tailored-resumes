@@ -55,14 +55,15 @@ const Index = () => {
     if (!element) return;
 
     const opt = {
-      margin: [0.5, 0.5],
+      margin: [0.75, 0.75],
       filename: `${personalInfo?.fullName.replace(/\s+/g, "_")}_resume.pdf`,
       image: { type: "jpeg", quality: 0.98 },
       html2canvas: { 
-        scale: 2,
+        scale: 4,
         useCORS: true,
         logging: true,
         letterRendering: true,
+        backgroundColor: '#ffffff',
       },
       jsPDF: { 
         unit: "in", 

@@ -4,7 +4,7 @@ let genAI: GoogleGenerativeAI;
 let model: GenerativeModel;
 
 const generationConfig: GenerationConfig = {
-  temperature: 0.7, // Reduced for more consistent output
+  temperature: 0.7,
   topP: 0.95,
   topK: 40,
   maxOutputTokens: 8192,
@@ -34,13 +34,14 @@ export const generateResume = async (
   }
 
   const prompt = `
-    Act as a professional resume writer with expertise in creating ATS-optimized resumes. 
-    Create a highly effective, professional resume using the following information:
+    You are a professional resume writer specializing in ATS-optimized resumes.
+    Create a highly effective resume following these strict guidelines:
 
-    ${personalInfo.existingCV ? `EXISTING CV CONTENT TO INCORPORATE:\n${personalInfo.existingCV}\n\n` : ""}
-
+    INPUT DATA:
+    ${personalInfo.existingCV ? `EXISTING RESUME CONTENT:\n${personalInfo.existingCV}\n\n` : ""}
+    
     CANDIDATE INFORMATION:
-    - Full Name: ${personalInfo.fullName}
+    - Name: ${personalInfo.fullName}
     - Email: ${personalInfo.email}
     ${personalInfo.phone ? `- Phone: ${personalInfo.phone}` : ""}
     ${personalInfo.location ? `- Location: ${personalInfo.location}` : ""}
@@ -49,20 +50,28 @@ export const generateResume = async (
     TARGET JOB DESCRIPTION:
     ${jobDescription}
 
-    REQUIREMENTS:
-    1. Create a resume that strongly aligns with the job requirements, emphasizing relevant keywords and skills
-    2. If an existing CV is provided, intelligently incorporate the most relevant experiences and achievements
-    3. Use clear, professional business English
-    4. Structure the content in these sections:
-       - Professional Summary (2-3 impactful sentences)
-       - Core Skills (bullet points of key technical and soft skills relevant to the role)
-       - Professional Experience (with measurable achievements)
-       - Education & Certifications
-    5. Ensure the content is ATS-friendly and optimized for the specific role
-    6. Use action verbs and quantifiable achievements where possible
-    7. Keep the formatting clean and simple, using only plain text
+    FORMATTING REQUIREMENTS:
+    1. DO NOT use any Markdown syntax (no **, ##, ``` etc.)
+    2. Use plain text formatting
+    3. Use clear section headers without special characters
+    4. Separate sections with blank lines
+    5. Use standard bullet points (•) for lists
+    6. Never repeat contact information
+    7. Fix any spelling errors (e.g., "isreal" should be "Israel")
 
-    Format each section with clear headings and maintain professional spacing.
+    CONTENT REQUIREMENTS:
+    1. Extract and prominently feature keywords from the job description
+    2. If an existing resume is provided, intelligently incorporate relevant experience
+    3. Use strong action verbs
+    4. Include measurable achievements
+    5. Maintain professional language and tone
+    6. Organize content in these sections:
+       - Professional Summary (2-3 impactful sentences)
+       - Core Skills (relevant to the job description)
+       - Professional Experience
+       - Education & Certifications
+
+    The output should be clean, professional, and ready for formatting without any special characters or markup.
   `;
 
   try {
