@@ -33,6 +33,29 @@ export const generateResume = async (
     throw new Error("Gemini API not initialized");
   }
 
+  const formatRequirements = [
+    "1. DO NOT use any Markdown syntax (no asterisks, hashtags, or backticks)",
+    "2. Use plain text formatting",
+    "3. Use clear section headers without special characters",
+    "4. Separate sections with blank lines",
+    "5. Use standard bullet points (•) for lists",
+    "6. Never repeat contact information",
+    "7. Fix any spelling errors (e.g., 'isreal' should be 'Israel')"
+  ].join('\n');
+
+  const contentRequirements = [
+    "1. Extract and prominently feature keywords from the job description",
+    "2. If an existing resume is provided, intelligently incorporate relevant experience",
+    "3. Use strong action verbs",
+    "4. Include measurable achievements",
+    "5. Maintain professional language and tone",
+    "6. Organize content in these sections:",
+    "   - Professional Summary (2-3 impactful sentences)",
+    "   - Core Skills (relevant to the job description)",
+    "   - Professional Experience",
+    "   - Education & Certifications"
+  ].join('\n');
+
   const prompt = `
     You are a professional resume writer specializing in ATS-optimized resumes.
     Create a highly effective resume following these strict guidelines:
@@ -51,25 +74,10 @@ export const generateResume = async (
     ${jobDescription}
 
     FORMATTING REQUIREMENTS:
-    1. DO NOT use any Markdown syntax (no **, ##, ``` etc.)
-    2. Use plain text formatting
-    3. Use clear section headers without special characters
-    4. Separate sections with blank lines
-    5. Use standard bullet points (•) for lists
-    6. Never repeat contact information
-    7. Fix any spelling errors (e.g., "isreal" should be "Israel")
+    ${formatRequirements}
 
     CONTENT REQUIREMENTS:
-    1. Extract and prominently feature keywords from the job description
-    2. If an existing resume is provided, intelligently incorporate relevant experience
-    3. Use strong action verbs
-    4. Include measurable achievements
-    5. Maintain professional language and tone
-    6. Organize content in these sections:
-       - Professional Summary (2-3 impactful sentences)
-       - Core Skills (relevant to the job description)
-       - Professional Experience
-       - Education & Certifications
+    ${contentRequirements}
 
     The output should be clean, professional, and ready for formatting without any special characters or markup.
   `;
