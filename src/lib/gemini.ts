@@ -4,7 +4,7 @@ let genAI: GoogleGenerativeAI;
 let model: GenerativeModel;
 
 const generationConfig: GenerationConfig = {
-  temperature: 1,
+  temperature: 0.7, // Reduced for more consistent output
   topP: 0.95,
   topK: 40,
   maxOutputTokens: 8192,
@@ -25,37 +25,44 @@ export const generateResume = async (
     phone?: string;
     location?: string;
     summary?: string;
+    existingCV?: string;
   },
   jobDescription: string,
-  existingCV?: string
 ) => {
   if (!genAI || !model) {
     throw new Error("Gemini API not initialized");
   }
 
   const prompt = `
-    Create a professional resume for a job application. Here are the details:
+    Act as a professional resume writer with expertise in creating ATS-optimized resumes. 
+    Create a highly effective, professional resume using the following information:
 
-    ${existingCV ? `Existing CV Content:\n${existingCV}\n\n` : ""}
+    ${personalInfo.existingCV ? `EXISTING CV CONTENT TO INCORPORATE:\n${personalInfo.existingCV}\n\n` : ""}
 
-    Personal Information:
-    - Name: ${personalInfo.fullName}
+    CANDIDATE INFORMATION:
+    - Full Name: ${personalInfo.fullName}
     - Email: ${personalInfo.email}
     ${personalInfo.phone ? `- Phone: ${personalInfo.phone}` : ""}
     ${personalInfo.location ? `- Location: ${personalInfo.location}` : ""}
     ${personalInfo.summary ? `\nProfessional Summary:\n${personalInfo.summary}` : ""}
 
-    Job Description:
+    TARGET JOB DESCRIPTION:
     ${jobDescription}
 
-    Please generate a resume that:
-    1. Is tailored to match the job requirements
-    2. Highlights relevant skills and experiences from the existing CV if provided
-    3. Uses professional, clear language
-    4. Is formatted in clear sections (Skills, Experience, Education)
-    5. Is ATS-friendly
+    REQUIREMENTS:
+    1. Create a resume that strongly aligns with the job requirements, emphasizing relevant keywords and skills
+    2. If an existing CV is provided, intelligently incorporate the most relevant experiences and achievements
+    3. Use clear, professional business English
+    4. Structure the content in these sections:
+       - Professional Summary (2-3 impactful sentences)
+       - Core Skills (bullet points of key technical and soft skills relevant to the role)
+       - Professional Experience (with measurable achievements)
+       - Education & Certifications
+    5. Ensure the content is ATS-friendly and optimized for the specific role
+    6. Use action verbs and quantifiable achievements where possible
+    7. Keep the formatting clean and simple, using only plain text
 
-    Format the output in a clean, readable way with proper spacing between sections.
+    Format each section with clear headings and maintain professional spacing.
   `;
 
   try {

@@ -17,9 +17,8 @@ const Index = () => {
     setStep(2);
   };
 
-  const handleJobDescriptionSubmit = async (jobDescription: string, existingCV?: string) => {
+  const handleJobDescriptionSubmit = async (jobDescription: string) => {
     try {
-      // Get the API key from environment
       const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
       
       if (!apiKey) {
@@ -38,7 +37,7 @@ const Index = () => {
         description: "Please wait while we create your tailored resume...",
       });
 
-      const content = await generateResume(personalInfo!, jobDescription, existingCV);
+      const content = await generateResume(personalInfo!, jobDescription);
       setGeneratedContent(content);
       setStep(3);
     } catch (error) {
@@ -56,11 +55,20 @@ const Index = () => {
     if (!element) return;
 
     const opt = {
-      margin: 1,
+      margin: [0.5, 0.5],
       filename: `${personalInfo?.fullName.replace(/\s+/g, "_")}_resume.pdf`,
       image: { type: "jpeg", quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
+      html2canvas: { 
+        scale: 2,
+        useCORS: true,
+        logging: true,
+        letterRendering: true,
+      },
+      jsPDF: { 
+        unit: "in", 
+        format: "letter", 
+        orientation: "portrait",
+      },
     };
 
     html2pdf().set(opt).from(element).save();
