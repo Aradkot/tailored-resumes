@@ -4,7 +4,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import * as mammoth from "mammoth";
-import * as pdfParse from "pdf-parse";
+import * as pdfjsLib from 'pdfjs-dist';
+
+// Initialize pdf.js worker
+pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
 export interface PersonalInfo {
   fullName: string;
@@ -31,12 +34,21 @@ export function PersonalInfoForm({ onNext }: PersonalInfoFormProps) {
       let text = "";
       
       if (file.type === "application/pdf") {
-        const buffer = await file.arrayBuffer();
-        const data = await pdfParse(buffer);
-        text = data.text;
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        const maxPages = pdf.numPages;
+        const textContent = [];
+        
+        for (let pageNum = 1; pageNum <= maxPages; pageNum++) {
+          const page = await pdf.getPage(pageNum);
+          const content = await page.getTextContent();
+          textContent.push(content.items.map((item: any) => item.str).join(' '));
+        }
+        
+        text = textContent.join('\n');
       } else if (file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
-        const buffer = await file.arrayBuffer();
-        const result = await mammoth.extractRawText({ arrayBuffer: buffer });
+        const arrayBuffer = await file.arrayBuffer();
+        const result = await mammoth.extractRawText({ arrayBuffer });
         text = result.value;
       } else if (file.type === "text/plain") {
         text = await file.text();
@@ -55,6 +67,7 @@ export function PersonalInfoForm({ onNext }: PersonalInfoFormProps) {
         description: "Your existing CV has been successfully loaded.",
       });
     } catch (error) {
+      console.error('Error reading file:', error);
       toast({
         title: "Error",
         description: "Failed to read the file. Please try again.",
