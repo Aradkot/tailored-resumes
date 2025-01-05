@@ -19,7 +19,18 @@ const Index = () => {
 
   const handleJobDescriptionSubmit = async (jobDescription: string) => {
     try {
-      const apiKey = "YOUR_GEMINI_API_KEY"; // We'll need to handle this securely
+      // Get the API key from environment
+      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+      
+      if (!apiKey) {
+        toast({
+          title: "Error",
+          description: "Gemini API key is not configured. Please set up your API key.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       initializeGemini(apiKey);
       
       toast({
@@ -31,9 +42,10 @@ const Index = () => {
       setGeneratedContent(content);
       setStep(3);
     } catch (error) {
+      console.error("Error generating resume:", error);
       toast({
         title: "Error",
-        description: "Failed to generate resume. Please try again.",
+        description: "Failed to generate resume. Please check your API key and try again.",
         variant: "destructive",
       });
     }
