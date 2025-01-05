@@ -3,6 +3,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
+import * as mammoth from "mammoth";
+import * as pdfParse from "pdf-parse";
 
 export interface PersonalInfo {
   fullName: string;
@@ -25,17 +27,28 @@ export function PersonalInfoForm({ onNext }: PersonalInfoFormProps) {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.type !== "text/plain") {
-      toast({
-        title: "Invalid File Type",
-        description: "Please upload a text file (.txt)",
-        variant: "destructive",
-      });
-      return;
-    }
-
     try {
-      const text = await file.text();
+      let text = "";
+      
+      if (file.type === "application/pdf") {
+        const buffer = await file.arrayBuffer();
+        const data = await pdfParse(buffer);
+        text = data.text;
+      } else if (file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
+        const buffer = await file.arrayBuffer();
+        const result = await mammoth.extractRawText({ arrayBuffer: buffer });
+        text = result.value;
+      } else if (file.type === "text/plain") {
+        text = await file.text();
+      } else {
+        toast({
+          title: "Invalid File Type",
+          description: "Please upload a PDF, Word (.docx), or text file (.txt)",
+          variant: "destructive",
+        });
+        return;
+      }
+
       setExistingCV(text);
       toast({
         title: "CV Uploaded",
@@ -62,6 +75,7 @@ export function PersonalInfoForm({ onNext }: PersonalInfoFormProps) {
       existingCV: existingCV,
     };
 
+    // Validate required fields
     if (!data.fullName || !data.email) {
       toast({
         title: "Required Fields Missing",
@@ -71,7 +85,14 @@ export function PersonalInfoForm({ onNext }: PersonalInfoFormProps) {
       return;
     }
 
-    onNext(data);
+    // Remove empty fields
+    Object.keys(data).forEach((key) => {
+      if (!data[key as keyof PersonalInfo]) {
+        delete data[key as keyof PersonalInfo];
+      }
+    });
+
+    onNext(data as PersonalInfo);
   };
 
   return (
@@ -83,7 +104,7 @@ export function PersonalInfoForm({ onNext }: PersonalInfoFormProps) {
         <Input
           id="existingCV"
           type="file"
-          accept=".txt"
+          accept=".txt,.pdf,.docx"
           onChange={handleFileUpload}
           className="mb-4"
         />

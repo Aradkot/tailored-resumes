@@ -2,7 +2,7 @@ import { useState } from "react";
 import { PersonalInfoForm, type PersonalInfo } from "@/components/ResumeBuilder/PersonalInfoForm";
 import { JobDescriptionForm } from "@/components/ResumeBuilder/JobDescriptionForm";
 import { ResumePreview } from "@/components/ResumeBuilder/ResumePreview";
-import { generateResume, initializeGemini } from "@/lib/gemini";
+import { generateResume } from "@/api/resume";
 import { useToast } from "@/hooks/use-toast";
 import html2pdf from "html2pdf.js";
 
@@ -19,19 +19,6 @@ const Index = () => {
 
   const handleJobDescriptionSubmit = async (jobDescription: string) => {
     try {
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-      
-      if (!apiKey) {
-        toast({
-          title: "Error",
-          description: "Gemini API key is not configured. Please set up your API key.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      initializeGemini(apiKey);
-      
       toast({
         title: "Generating Resume",
         description: "Please wait while we create your tailored resume...",
@@ -44,7 +31,7 @@ const Index = () => {
       console.error("Error generating resume:", error);
       toast({
         title: "Error",
-        description: "Failed to generate resume. Please check your API key and try again.",
+        description: "Failed to generate resume. Please try again.",
         variant: "destructive",
       });
     }

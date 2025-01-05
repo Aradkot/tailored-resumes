@@ -20,40 +20,30 @@ export function ResumePreview({
   const [template, setTemplate] = useState("professional");
 
   const getTemplateStyles = () => {
+    const baseStyles = {
+      container: "p-8 max-w-[800px] mx-auto bg-white shadow-lg h-[1056px] overflow-hidden", // US Letter size in pixels
+      header: "text-center border-b border-gray-200 pb-6 mb-6",
+      name: "text-3xl font-bold text-gray-900 mb-2",
+      contact: "mt-2 text-gray-600 flex flex-wrap gap-3 justify-center",
+      section: "mb-6",
+      sectionTitle: "text-xl font-bold text-gray-900 mb-3 border-b border-gray-200 pb-1",
+      content: "text-gray-700 leading-relaxed",
+      bullet: "list-disc ml-4 mb-2",
+    };
+
     switch (template) {
       case "creative":
         return {
-          container: "p-8 max-w-[800px] mx-auto bg-gradient-to-br from-blue-50 to-white shadow-lg",
-          header: "text-center border-b border-blue-200 pb-6 mb-6",
-          name: "text-3xl font-bold text-blue-800 mb-2",
-          contact: "mt-2 text-blue-600 flex flex-wrap gap-3 justify-center",
-          section: "mb-6 border-l-4 border-blue-400 pl-4",
-          sectionTitle: "text-xl font-bold text-blue-800 mb-3",
-          content: "text-blue-900 leading-relaxed",
-          bullet: "list-disc ml-4 mb-2",
+          ...baseStyles,
+          container: `${baseStyles.container} bg-gradient-to-br from-blue-50 to-white`,
         };
       case "tech":
         return {
-          container: "p-8 max-w-[800px] mx-auto bg-slate-50 shadow-lg border-t-4 border-indigo-500",
-          header: "text-left border-b border-slate-200 pb-6 mb-6",
-          name: "text-3xl font-bold text-slate-800 mb-2",
-          contact: "mt-2 text-slate-600 flex flex-wrap gap-4",
-          section: "mb-6 py-2",
-          sectionTitle: "text-xl font-bold text-indigo-600 mb-3 border-b border-indigo-200 pb-1",
-          content: "text-slate-700 leading-relaxed",
-          bullet: "list-disc ml-4 mb-2",
+          ...baseStyles,
+          container: `${baseStyles.container} bg-slate-50 border-t-4 border-indigo-500`,
         };
       default: // professional
-        return {
-          container: "p-8 max-w-[800px] mx-auto bg-white shadow-lg",
-          header: "text-center border-b border-gray-200 pb-6 mb-6",
-          name: "text-3xl font-bold text-gray-900 mb-2",
-          contact: "mt-2 text-gray-600 flex flex-wrap gap-3 justify-center",
-          section: "mb-6",
-          sectionTitle: "text-xl font-bold text-gray-900 mb-3 border-b border-gray-200 pb-1",
-          content: "text-gray-700 leading-relaxed",
-          bullet: "list-disc ml-4 mb-2",
-        };
+        return baseStyles;
     }
   };
 
